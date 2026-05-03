@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package common.v1;
 
-option go_package = "github.com/doquoctuan/rebook/proto/gen/common/v1;commonv1";
+option go_package = "github.com/rebook-vn/proto/gen/common/v1;commonv1";
 
 // Uuid wraps a UUID string for use in protos that cannot use google.protobuf.StringValue.
 message Uuid {

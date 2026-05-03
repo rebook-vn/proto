@@ -4,7 +4,7 @@ package booklisting.v1;
 
 import "google/protobuf/timestamp.proto";
 
-option go_package = "github.com/doquoctuan/rebook/proto/gen/booklisting/v1;booklistingv1";
+option go_package = "github.com/rebook-vn/proto/gen/booklisting/v1;booklistingv1";
 
 message BookInfo {
   string title        = 1;

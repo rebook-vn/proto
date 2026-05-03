@@ -4,7 +4,7 @@ package auth.v1;
 
 import "google/api/annotations.proto";
 
-option go_package = "github.com/doquoctuan/rebook/proto/gen/auth/v1;authv1";
+option go_package = "github.com/rebook-vn/proto/gen/auth/v1;authv1";
 
 // AuthService is the only authentication surface exposed to browsers.
 // Kratos and Hydra are not directly callable; the Auth Service owns the
