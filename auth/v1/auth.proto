@@ -1,0 +1,113 @@
+syntax = "proto3";
+
+package auth.v1;
+
+import "google/api/annotations.proto";
+
+option go_package = "github.com/doquoctuan/rebook/proto/gen/auth/v1;authv1";
+
+// AuthService is the only authentication surface exposed to browsers.
+// Kratos and Hydra are not directly callable; the Auth Service owns the
+// entire OTP + token lifecycle on their behalf.
+service AuthService {
+  // SendOTP initiates a Kratos Native login or registration flow for the
+  // given phone number and triggers the SMS courier (dev: code is always
+  // 123456). Returns an opaque flow_token to be submitted with VerifyOTP.
+  rpc SendOTP(SendOTPRequest) returns (SendOTPResponse) {
+    option (google.api.http) = {
+      post: "/api/auth/otp/send"
+      body: "*"
+    };
+  }
+
+  // VerifyOTP submits the OTP code to Kratos, then drives the headless
+  // Hydra OAuth2 flow server-side and returns access and refresh tokens.
+  rpc VerifyOTP(VerifyOTPRequest) returns (VerifyOTPResponse) {
+    option (google.api.http) = {
+      post: "/api/auth/otp/verify"
+      body: "*"
+    };
+  }
+
+  // RefreshToken exchanges a refresh token for a new access token.
+  rpc RefreshToken(RefreshTokenRequest) returns (RefreshTokenResponse) {
+    option (google.api.http) = {
+      post: "/api/auth/token/refresh"
+      body: "*"
+    };
+  }
+
+  // Logout revokes the refresh token in Hydra and the Kratos session.
+  rpc Logout(LogoutRequest) returns (LogoutResponse) {
+    option (google.api.http) = {
+      post: "/api/auth/logout"
+      body: "*"
+    };
+  }
+
+  // GetMe returns the authenticated user's identity (phone, name).
+  rpc GetMe(GetMeRequest) returns (GetMeResponse) {
+    option (google.api.http) = {
+      get: "/api/auth/me"
+    };
+  }
+
+  // ValidateToken is called by Caddy forward_auth / Nginx auth-url on
+  // every authenticated request. It introspects the Bearer token and
+  // sets the X-Identity-Sub HTTP response header on success.
+  rpc ValidateToken(ValidateTokenRequest) returns (ValidateTokenResponse) {
+    option (google.api.http) = {
+      get: "/api/auth/validate"
+    };
+  }
+}
+
+message SendOTPRequest {
+  string phone = 1;        // E.164: "+84..."
+  string name  = 2;        // optional; required only on first registration
+}
+
+message SendOTPResponse {
+  string flow_token = 1;
+  string expires_at = 2;   // RFC3339
+  bool   is_new    = 3;    // true if no Kratos identity exists for this phone
+}
+
+message VerifyOTPRequest {
+  string flow_token = 1;
+  string code       = 2;
+}
+
+message VerifyOTPResponse {
+  string access_token  = 1;
+  string refresh_token = 2;
+  int64  expires_in    = 3;
+}
+
+message RefreshTokenRequest {
+  string refresh_token = 1;
+}
+
+message RefreshTokenResponse {
+  string access_token  = 1;
+  string refresh_token = 2;
+  int64  expires_in    = 3;
+}
+
+message LogoutRequest {
+  string refresh_token = 1;
+}
+
+message LogoutResponse {}
+
+message GetMeRequest {}
+
+message GetMeResponse {
+  string id    = 1; // Kratos identity ID (UUID)
+  string phone = 2; // E.164
+  string name  = 3;
+}
+
+message ValidateTokenRequest {}
+
+message ValidateTokenResponse {}

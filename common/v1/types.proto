@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package common.v1;
+
+option go_package = "github.com/doquoctuan/rebook/proto/gen/common/v1;commonv1";
+
+// Uuid wraps a UUID string for use in protos that cannot use google.protobuf.StringValue.
+message Uuid {
+  string value = 1;
+}
+
+// Timestamp is an ISO-8601 string timestamp (RFC 3339).
+message Timestamp {
+  string value = 1;
+}
+
+// ConfidenceField pairs a field name with its model confidence score.
+message ConfidenceField {
+  string name  = 1;
+  float  score = 2;
+}
+
+// ConfidenceMap is the full set of per-field confidence scores from the AI scanner.
+message ConfidenceMap {
+  repeated ConfidenceField fields = 1;
+}

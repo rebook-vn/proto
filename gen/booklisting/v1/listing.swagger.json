@@ -1,0 +1,429 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "booklisting/v1/listing.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "BookListingService"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/api/v1/books/scan": {
+      "post": {
+        "summary": "ScanBookCover accepts a stream of image chunks and returns a scan job ID.",
+        "operationId": "BookListingService_ScanBookCover",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ScanBookCoverResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "description": " (streaming inputs)",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1ScanBookCoverRequest"
+            }
+          }
+        ],
+        "tags": [
+          "BookListingService"
+        ]
+      }
+    },
+    "/api/v1/listings": {
+      "post": {
+        "summary": "CreateListing persists a new book listing from a completed scan.",
+        "operationId": "BookListingService_CreateListing",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1CreateListingResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1CreateListingRequest"
+            }
+          }
+        ],
+        "tags": [
+          "BookListingService"
+        ]
+      }
+    },
+    "/api/v1/listings/{listingId}": {
+      "get": {
+        "summary": "GetListing returns a public listing by id.",
+        "operationId": "BookListingService_GetListing",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetListingResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "listingId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "BookListingService"
+        ]
+      }
+    },
+    "/api/v1/scans/{scanId}": {
+      "get": {
+        "summary": "GetScan returns the current state of a scan job.",
+        "operationId": "BookListingService_GetScan",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetScanResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "scanId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "BookListingService"
+        ]
+      }
+    },
+    "/api/v1/scans/{scanId}/stream": {
+      "get": {
+        "summary": "StreamScan streams scan progress events until the job is terminal.",
+        "operationId": "BookListingService_StreamScan",
+        "responses": {
+          "200": {
+            "description": "A successful response.(streaming responses)",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "result": {
+                  "$ref": "#/definitions/v1ScanEvent"
+                },
+                "error": {
+                  "$ref": "#/definitions/rpcStatus"
+                }
+              },
+              "title": "Stream result of v1ScanEvent"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "scanId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "BookListingService"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v1ConfidenceField": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "score": {
+          "type": "number",
+          "format": "float"
+        }
+      },
+      "description": "ConfidenceField pairs a field name with its model confidence score."
+    },
+    "v1ConfidenceMap": {
+      "type": "object",
+      "properties": {
+        "fields": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1ConfidenceField"
+          }
+        }
+      },
+      "description": "ConfidenceMap is the full set of per-field confidence scores from the AI scanner."
+    },
+    "v1CreateListingRequest": {
+      "type": "object",
+      "properties": {
+        "scanId": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "author": {
+          "type": "string"
+        },
+        "isbn": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "genre": {
+          "type": "string"
+        },
+        "language": {
+          "type": "string"
+        },
+        "condition": {
+          "type": "string"
+        },
+        "priceVnd": {
+          "type": "string",
+          "format": "int64"
+        },
+        "isDonation": {
+          "type": "boolean"
+        },
+        "location": {
+          "type": "string"
+        }
+      }
+    },
+    "v1CreateListingResponse": {
+      "type": "object",
+      "properties": {
+        "listingId": {
+          "type": "string"
+        },
+        "slug": {
+          "type": "string"
+        }
+      }
+    },
+    "v1GetListingResponse": {
+      "type": "object",
+      "properties": {
+        "listing": {
+          "$ref": "#/definitions/v1Listing"
+        },
+        "coverUrl": {
+          "type": "string"
+        }
+      }
+    },
+    "v1GetScanResponse": {
+      "type": "object",
+      "properties": {
+        "scanId": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string",
+          "title": "PENDING | PROCESSING | DONE | FAILED"
+        },
+        "title": {
+          "type": "string"
+        },
+        "author": {
+          "type": "string"
+        },
+        "confidence": {
+          "$ref": "#/definitions/v1ConfidenceMap"
+        },
+        "isbn": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "genre": {
+          "type": "string"
+        },
+        "language": {
+          "type": "string"
+        },
+        "requiresReview": {
+          "type": "boolean"
+        }
+      }
+    },
+    "v1Listing": {
+      "type": "object",
+      "properties": {
+        "listingId": {
+          "type": "string"
+        },
+        "ownerId": {
+          "type": "string"
+        },
+        "scanId": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "author": {
+          "type": "string"
+        },
+        "isbn": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "genre": {
+          "type": "string"
+        },
+        "language": {
+          "type": "string"
+        },
+        "condition": {
+          "type": "string"
+        },
+        "priceVnd": {
+          "type": "string",
+          "format": "int64"
+        },
+        "isDonation": {
+          "type": "boolean"
+        },
+        "location": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string"
+        }
+      }
+    },
+    "v1ScanBookCoverRequest": {
+      "type": "object",
+      "properties": {
+        "chunk": {
+          "type": "string",
+          "format": "byte",
+          "title": "raw image bytes (chunked)"
+        },
+        "filename": {
+          "type": "string",
+          "title": "original filename, first chunk only"
+        }
+      }
+    },
+    "v1ScanBookCoverResponse": {
+      "type": "object",
+      "properties": {
+        "scanId": {
+          "type": "string"
+        }
+      }
+    },
+    "v1ScanEvent": {
+      "type": "object",
+      "properties": {
+        "scanId": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,126 @@
+syntax = "proto3";
+
+package booklisting.v1;
+
+import "google/api/annotations.proto";
+import "common/v1/types.proto";
+
+option go_package = "github.com/doquoctuan/rebook/proto/gen/booklisting/v1;booklistingv1";
+
+// BookListingService owns scan and listing lifecycles.
+service BookListingService {
+  // ScanBookCover accepts a stream of image chunks and returns a scan job ID.
+  rpc ScanBookCover(stream ScanBookCoverRequest) returns (ScanBookCoverResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/books/scan"
+      body: "*"
+    };
+  }
+
+  // CreateListing persists a new book listing from a completed scan.
+  rpc CreateListing(CreateListingRequest) returns (CreateListingResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/listings"
+      body: "*"
+    };
+  }
+
+  // GetListing returns a public listing by id.
+  rpc GetListing(GetListingRequest) returns (GetListingResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/listings/{listing_id}"
+    };
+  }
+
+  // GetScan returns the current state of a scan job.
+  rpc GetScan(GetScanRequest) returns (GetScanResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/scans/{scan_id}"
+    };
+  }
+
+  // StreamScan streams scan progress events until the job is terminal.
+  rpc StreamScan(GetScanRequest) returns (stream ScanEvent) {
+    option (google.api.http) = {
+      get: "/api/v1/scans/{scan_id}/stream"
+    };
+  }
+}
+
+message ScanBookCoverRequest {
+  bytes  chunk    = 1; // raw image bytes (chunked)
+  string filename = 2; // original filename, first chunk only
+}
+
+message ScanBookCoverResponse {
+  string scan_id = 1;
+}
+
+message Listing {
+  string listing_id  = 1;
+  string owner_id    = 2;
+  string scan_id     = 3;
+  string title       = 4;
+  string author      = 5;
+  string isbn        = 6;
+  string description = 7;
+  string genre       = 8;
+  string language    = 9;
+  string condition   = 10;
+  int64  price_vnd   = 11;
+  bool   is_donation = 12;
+  string location    = 13;
+  string status      = 14;
+  string created_at  = 15;
+}
+
+message CreateListingRequest {
+  string scan_id     = 1;
+  string title       = 2;
+  string author      = 3;
+  string isbn        = 4;
+  string description = 5;
+  string genre       = 6;
+  string language    = 7;
+  string condition   = 8;
+  int64  price_vnd   = 9;
+  bool   is_donation = 10;
+  string location    = 11;
+}
+
+message CreateListingResponse {
+  string listing_id = 1;
+  string slug       = 2;
+}
+
+message GetListingRequest {
+  string listing_id = 1;
+}
+
+message GetListingResponse {
+  Listing listing  = 1;
+  string  cover_url = 2;
+}
+
+message GetScanRequest {
+  string scan_id = 1;
+}
+
+message GetScanResponse {
+  string                  scan_id     = 1;
+  string                  status      = 2; // PENDING | PROCESSING | DONE | FAILED
+  string                  title       = 3;
+  string                  author      = 4;
+  common.v1.ConfidenceMap confidence  = 5;
+  string                  isbn        = 6;
+  string                  description = 7;
+  string                  genre       = 8;
+  string                  language    = 9;
+  bool                    requires_review = 10;
+}
+
+message ScanEvent {
+  string scan_id = 1;
+  string status  = 2;
+  string message = 3;
+}
