@@ -1,4 +1,4 @@
-module github.com/doquoctuan/rebook/proto/gen
+module github.com/rebook-vn/proto/gen
 
 go 1.26.0
 
