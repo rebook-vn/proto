@@ -1,8 +1,11 @@
 BUF=buf
 
 .PHONY: generate
-generate:
+generate: generate-py
 	$(BUF) generate
+
+generate-py:
+	$(BUF) generate --template buf.gen.py.yaml
 
 .PHONY: lint
 lint:

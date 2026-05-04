@@ -3,5 +3,6 @@ clean: true
 plugins:
   - remote: buf.build/protocolbuffers/python
     out: ../services/ai-scanner/proto-gen
+    
   - remote: buf.build/protocolbuffers/pyi
     out: ../services/ai-scanner/proto-gen
