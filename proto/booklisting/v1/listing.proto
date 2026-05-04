@@ -2,10 +2,11 @@ syntax = "proto3";
 
 package booklisting.v1;
 
+import "buf/validate/validate.proto";
 import "google/api/annotations.proto";
 import "common/v1/types.proto";
 
-option go_package = "github.com/rebook-vn/proto/gen/booklisting/v1;booklistingv1";
+option go_package = "github.com/rebook-vn/proto/gen/go/booklisting/v1;booklistingv1";
 
 // BookListingService owns scan and listing lifecycles.
 service BookListingService {
@@ -75,15 +76,17 @@ message Listing {
 }
 
 message CreateListingRequest {
-  string scan_id     = 1;
-  string title       = 2;
+  string scan_id     = 1 [(buf.validate.field).string.min_len = 1];
+  string title       = 2 [(buf.validate.field).string.min_len = 1];
   string author      = 3;
   string isbn        = 4;
   string description = 5;
   string genre       = 6;
   string language    = 7;
-  string condition   = 8;
-  int64  price_vnd   = 9;
+  string condition   = 8 [(buf.validate.field).string = {
+    in: ["NEW", "LIKE_NEW", "GOOD", "FAIR", "POOR"]
+  }];
+  int64  price_vnd   = 9 [(buf.validate.field).int64.gte = 0];
   bool   is_donation = 10;
   string location    = 11;
 }
@@ -94,7 +97,7 @@ message CreateListingResponse {
 }
 
 message GetListingRequest {
-  string listing_id = 1;
+  string listing_id = 1 [(buf.validate.field).string.min_len = 1];
 }
 
 message GetListingResponse {
@@ -103,7 +106,7 @@ message GetListingResponse {
 }
 
 message GetScanRequest {
-  string scan_id = 1;
+  string scan_id = 1 [(buf.validate.field).string.min_len = 1];
 }
 
 message GetScanResponse {

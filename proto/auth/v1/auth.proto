@@ -2,9 +2,10 @@ syntax = "proto3";
 
 package auth.v1;
 
+import "buf/validate/validate.proto";
 import "google/api/annotations.proto";
 
-option go_package = "github.com/rebook-vn/proto/gen/auth/v1;authv1";
+option go_package = "github.com/rebook-vn/proto/gen/go/auth/v1;authv1";
 
 // AuthService is the only authentication surface exposed to browsers.
 // Kratos and Hydra are not directly callable; the Auth Service owns the
@@ -63,8 +64,11 @@ service AuthService {
 }
 
 message SendOTPRequest {
-  string phone = 1;        // E.164: "+84..."
-  string name  = 2;        // optional; required only on first registration
+  string phone = 1 [(buf.validate.field).string = {
+    pattern: "^\\+[1-9]\\d{1,14}$"
+    min_len: 8
+  }]; // E.164: "+84..."
+  string name  = 2; // optional; required only on first registration
 }
 
 message SendOTPResponse {
@@ -74,8 +78,11 @@ message SendOTPResponse {
 }
 
 message VerifyOTPRequest {
-  string flow_token = 1;
-  string code       = 2;
+  string flow_token = 1 [(buf.validate.field).string.min_len = 1];
+  string code       = 2 [(buf.validate.field).string = {
+    pattern: "^\\d{6}$"
+    len: 6
+  }];
 }
 
 message VerifyOTPResponse {
@@ -85,7 +92,7 @@ message VerifyOTPResponse {
 }
 
 message RefreshTokenRequest {
-  string refresh_token = 1;
+  string refresh_token = 1 [(buf.validate.field).string.min_len = 1];
 }
 
 message RefreshTokenResponse {
@@ -95,7 +102,7 @@ message RefreshTokenResponse {
 }
 
 message LogoutRequest {
-  string refresh_token = 1;
+  string refresh_token = 1 [(buf.validate.field).string.min_len = 1];
 }
 
 message LogoutResponse {}
