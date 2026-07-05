@@ -1,0 +1,68 @@
+name: Regenerate and Tag
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'proto/**/*.proto'
+      - 'buf.yaml'
+      - 'buf.gen.yaml'
+      - 'buf.gen.py.yaml'
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Install protoc plugins
+        run: |
+          go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
+          go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
+          go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway@latest
+          go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2@latest
+
+      - uses: bufbuild/buf-action@v1
+        with:
+          setup_only: true
+
+      - name: Lint
+        run: buf lint
+
+      - name: Generate
+        run: buf generate
+
+      - name: Commit generated stubs
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add gen/
+          if git diff --staged --quiet; then
+            echo "No generated file changes, skipping commit."
+          else
+            git commit -m "chore: regenerate stubs [skip ci]"
+            git push
+          fi
+
+      - name: Bump and push tag
+        run: |
+          LATEST=$(git tag --sort=-v:refname | grep '^v' | head -1)
+          if [ -z "$LATEST" ]; then
+            NEW_TAG="v0.1.0"
+          else
+            IFS='.' read -r MAJOR MINOR PATCH <<< "${LATEST#v}"
+            NEW_TAG="v${MAJOR}.${MINOR}.$((PATCH + 1))"
+          fi
+          git tag "$NEW_TAG"
+          git push origin "$NEW_TAG"
+          echo "Tagged $NEW_TAG"
