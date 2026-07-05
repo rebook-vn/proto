@@ -22,7 +22,7 @@ service AuthService {
   }
 
   // VerifyOTP submits the OTP code to Kratos, then drives the headless
-  // Hydra OAuth2 flow server-side and returns access and refresh tokens.
+  // Hydra OAuth2 flow server-side and returns access and refresh tokens. 
   rpc VerifyOTP(VerifyOTPRequest) returns (VerifyOTPResponse) {
     option (google.api.http) = {
       post: "/api/auth/otp/verify"
