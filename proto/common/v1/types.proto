@@ -16,8 +16,8 @@ message Timestamp {
 
 // ConfidenceField pairs a field name with its model confidence score.
 message ConfidenceField {
-  string name  = 1;
-  float  score = 2;
+  string name = 1;
+  float score = 2;
 }
 
 // ConfidenceMap is the full set of per-field confidence scores from the AI scanner.

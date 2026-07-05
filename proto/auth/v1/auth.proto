@@ -22,7 +22,7 @@ service AuthService {
   }
 
   // VerifyOTP submits the OTP code to Kratos, then drives the headless
-  // Hydra OAuth2 flow server-side and returns access and refresh tokens. 
+  // Hydra OAuth2 flow server-side and returns access and refresh tokens.
   rpc VerifyOTP(VerifyOTPRequest) returns (VerifyOTPResponse) {
     option (google.api.http) = {
       post: "/api/auth/otp/verify"
@@ -48,18 +48,14 @@ service AuthService {
 
   // GetMe returns the authenticated user's identity (phone, name).
   rpc GetMe(GetMeRequest) returns (GetMeResponse) {
-    option (google.api.http) = {
-      get: "/api/auth/me"
-    };
+    option (google.api.http) = {get: "/api/auth/me"};
   }
 
   // ValidateToken is called by Caddy forward_auth / Nginx auth-url on
   // every authenticated request. It introspects the Bearer token and
   // sets the X-Identity-Sub HTTP response header on success.
   rpc ValidateToken(ValidateTokenRequest) returns (ValidateTokenResponse) {
-    option (google.api.http) = {
-      get: "/api/auth/validate"
-    };
+    option (google.api.http) = {get: "/api/auth/validate"};
   }
 }
 
@@ -68,27 +64,27 @@ message SendOTPRequest {
     pattern: "^\\+[1-9]\\d{1,14}$"
     min_len: 8
   }]; // E.164: "+84..."
-  string name  = 2; // optional; required only on first registration
+  string name = 2; // optional; required only on first registration
 }
 
 message SendOTPResponse {
   string flow_token = 1;
-  string expires_at = 2;   // RFC3339
-  bool   is_new    = 3;    // true if no Kratos identity exists for this phone
+  string expires_at = 2; // RFC3339
+  bool is_new = 3; // true if no Kratos identity exists for this phone
 }
 
 message VerifyOTPRequest {
   string flow_token = 1 [(buf.validate.field).string.min_len = 1];
-  string code       = 2 [(buf.validate.field).string = {
+  string code = 2 [(buf.validate.field).string = {
     pattern: "^\\d{6}$"
     len: 6
   }];
 }
 
 message VerifyOTPResponse {
-  string access_token  = 1;
+  string access_token = 1;
   string refresh_token = 2;
-  int64  expires_in    = 3;
+  int64 expires_in = 3;
 }
 
 message RefreshTokenRequest {
@@ -96,9 +92,9 @@ message RefreshTokenRequest {
 }
 
 message RefreshTokenResponse {
-  string access_token  = 1;
+  string access_token = 1;
   string refresh_token = 2;
-  int64  expires_in    = 3;
+  int64 expires_in = 3;
 }
 
 message LogoutRequest {
@@ -110,9 +106,9 @@ message LogoutResponse {}
 message GetMeRequest {}
 
 message GetMeResponse {
-  string id    = 1; // Kratos identity ID (UUID)
+  string id = 1; // Kratos identity ID (UUID)
   string phone = 2; // E.164
-  string name  = 3;
+  string name = 3;
 }
 
 message ValidateTokenRequest {}

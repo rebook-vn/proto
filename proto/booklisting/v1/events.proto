@@ -7,62 +7,62 @@ import "google/protobuf/timestamp.proto";
 option go_package = "github.com/rebook-vn/proto/gen/go/booklisting/v1;booklistingv1";
 
 message BookInfo {
-  string title        = 1;
-  string author       = 2;
-  string isbn         = 3;
-  string genre        = 4;
-  string language     = 5;
-  string description  = 6;
-  string cover_url    = 7;
-  string publisher    = 8;
-  int32  publish_year = 9;
-  int32  page_count   = 10;
+  string title = 1;
+  string author = 2;
+  string isbn = 3;
+  string genre = 4;
+  string language = 5;
+  string description = 6;
+  string cover_url = 7;
+  string publisher = 8;
+  int32 publish_year = 9;
+  int32 page_count = 10;
 }
 
 message ScanRequestedEvent {
-  string event_id   = 1;
-  string scan_id    = 2;
-  string user_id    = 3;
+  string event_id = 1;
+  string scan_id = 2;
+  string user_id = 3;
   string object_key = 4;
   google.protobuf.Timestamp scanned_at = 5;
 }
 
 message ScanProcessingStartedEvent {
-  string event_id   = 1;
-  string scan_id    = 2;
+  string event_id = 1;
+  string scan_id = 2;
   google.protobuf.Timestamp started_at = 3;
 }
 
 message ScanCompletedEvent {
-  string   event_id        = 1;
-  string   scan_id          = 2;
-  BookInfo book_info        = 3;
+  string event_id = 1;
+  string scan_id = 2;
+  BookInfo book_info = 3;
   // Per-field confidence in percent (0-100); also reserves
   // the meta key "requires_review" via convention.
   map<string, double> confidence_map = 4;
-  bool     requires_review  = 5;
+  bool requires_review = 5;
   google.protobuf.Timestamp completed_at = 6;
 }
 
 message ScanFailedEvent {
-  string event_id     = 1;
-  string scan_id      = 2;
-  string error_code   = 3;
+  string event_id = 1;
+  string scan_id = 2;
+  string error_code = 3;
   string error_message = 4;
   google.protobuf.Timestamp failed_at = 5;
 }
 
 message ListingCreatedEvent {
-  string event_id    = 1;
-  string listing_id  = 2;
-  string owner_id    = 3;
-  string title       = 4;
-  string author      = 5;
-  string isbn        = 6;
-  string genre       = 7;
-  string condition   = 8;
-  int64  price_vnd   = 9;
-  bool   is_donation = 10;
-  string cover_url   = 11; // presigned GET URL valid for 1h
+  string event_id = 1;
+  string listing_id = 2;
+  string owner_id = 3;
+  string title = 4;
+  string author = 5;
+  string isbn = 6;
+  string genre = 7;
+  string condition = 8;
+  int64 price_vnd = 9;
+  bool is_donation = 10;
+  string cover_url = 11; // presigned GET URL valid for 1h
   google.protobuf.Timestamp created_at = 12;
 }

@@ -3,8 +3,8 @@ syntax = "proto3";
 package booklisting.v1;
 
 import "buf/validate/validate.proto";
-import "google/api/annotations.proto";
 import "common/v1/types.proto";
+import "google/api/annotations.proto";
 
 option go_package = "github.com/rebook-vn/proto/gen/go/booklisting/v1;booklistingv1";
 
@@ -28,28 +28,22 @@ service BookListingService {
 
   // GetListing returns a public listing by id.
   rpc GetListing(GetListingRequest) returns (GetListingResponse) {
-    option (google.api.http) = {
-      get: "/api/v1/listings/{listing_id}"
-    };
+    option (google.api.http) = {get: "/api/v1/listings/{listing_id}"};
   }
 
   // GetScan returns the current state of a scan job.
   rpc GetScan(GetScanRequest) returns (GetScanResponse) {
-    option (google.api.http) = {
-      get: "/api/v1/scans/{scan_id}"
-    };
+    option (google.api.http) = {get: "/api/v1/scans/{scan_id}"};
   }
 
   // StreamScan streams scan progress events until the job is terminal.
-  rpc StreamScan(GetScanRequest) returns (stream ScanEvent) {
-    option (google.api.http) = {
-      get: "/api/v1/scans/{scan_id}/stream"
-    };
+  rpc StreamScan(StreamScanRequest) returns (stream StreamScanResponse) {
+    option (google.api.http) = {get: "/api/v1/scans/{scan_id}/stream"};
   }
 }
 
 message ScanBookCoverRequest {
-  bytes  chunk    = 1; // raw image bytes (chunked)
+  bytes chunk = 1; // raw image bytes (chunked)
   string filename = 2; // original filename, first chunk only
 }
 
@@ -58,42 +52,48 @@ message ScanBookCoverResponse {
 }
 
 message Listing {
-  string listing_id  = 1;
-  string owner_id    = 2;
-  string scan_id     = 3;
-  string title       = 4;
-  string author      = 5;
-  string isbn        = 6;
+  string listing_id = 1;
+  string owner_id = 2;
+  string scan_id = 3;
+  string title = 4;
+  string author = 5;
+  string isbn = 6;
   string description = 7;
-  string genre       = 8;
-  string language    = 9;
-  string condition   = 10;
-  int64  price_vnd   = 11;
-  bool   is_donation = 12;
-  string location    = 13;
-  string status      = 14;
-  string created_at  = 15;
+  string genre = 8;
+  string language = 9;
+  string condition = 10;
+  int64 price_vnd = 11;
+  bool is_donation = 12;
+  string location = 13;
+  string status = 14;
+  string created_at = 15;
 }
 
 message CreateListingRequest {
-  string scan_id     = 1 [(buf.validate.field).string.min_len = 1];
-  string title       = 2 [(buf.validate.field).string.min_len = 1];
-  string author      = 3;
-  string isbn        = 4;
+  string scan_id = 1 [(buf.validate.field).string.min_len = 1];
+  string title = 2 [(buf.validate.field).string.min_len = 1];
+  string author = 3;
+  string isbn = 4;
   string description = 5;
-  string genre       = 6;
-  string language    = 7;
-  string condition   = 8 [(buf.validate.field).string = {
-    in: ["NEW", "LIKE_NEW", "GOOD", "FAIR", "POOR"]
+  string genre = 6;
+  string language = 7;
+  string condition = 8 [(buf.validate.field).string = {
+    in: [
+      "NEW",
+      "LIKE_NEW",
+      "GOOD",
+      "FAIR",
+      "POOR"
+    ]
   }];
-  int64  price_vnd   = 9 [(buf.validate.field).int64.gte = 0];
-  bool   is_donation = 10;
-  string location    = 11;
+  int64 price_vnd = 9 [(buf.validate.field).int64.gte = 0];
+  bool is_donation = 10;
+  string location = 11;
 }
 
 message CreateListingResponse {
   string listing_id = 1;
-  string slug       = 2;
+  string slug = 2;
 }
 
 message GetListingRequest {
@@ -101,8 +101,8 @@ message GetListingRequest {
 }
 
 message GetListingResponse {
-  Listing listing  = 1;
-  string  cover_url = 2;
+  Listing listing = 1;
+  string cover_url = 2;
 }
 
 message GetScanRequest {
@@ -110,20 +110,24 @@ message GetScanRequest {
 }
 
 message GetScanResponse {
-  string                  scan_id     = 1;
-  string                  status      = 2; // PENDING | PROCESSING | DONE | FAILED
-  string                  title       = 3;
-  string                  author      = 4;
-  common.v1.ConfidenceMap confidence  = 5;
-  string                  isbn        = 6;
-  string                  description = 7;
-  string                  genre       = 8;
-  string                  language    = 9;
-  bool                    requires_review = 10;
+  string scan_id = 1;
+  string status = 2; // PENDING | PROCESSING | DONE | FAILED
+  string title = 3;
+  string author = 4;
+  common.v1.ConfidenceMap confidence = 5;
+  string isbn = 6;
+  string description = 7;
+  string genre = 8;
+  string language = 9;
+  bool requires_review = 10;
 }
 
-message ScanEvent {
+message StreamScanRequest {
+  string scan_id = 1 [(buf.validate.field).string.min_len = 1];
+}
+
+message StreamScanResponse {
   string scan_id = 1;
-  string status  = 2;
+  string status = 2;
   string message = 3;
 }
