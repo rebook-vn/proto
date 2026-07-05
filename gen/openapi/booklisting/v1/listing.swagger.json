@@ -156,13 +156,13 @@
               "type": "object",
               "properties": {
                 "result": {
-                  "$ref": "#/definitions/v1ScanEvent"
+                  "$ref": "#/definitions/v1StreamScanResponse"
                 },
                 "error": {
                   "$ref": "#/definitions/rpcStatus"
                 }
               },
-              "title": "Stream result of v1ScanEvent"
+              "title": "Stream result of v1StreamScanResponse"
             }
           },
           "default": {
@@ -411,7 +411,7 @@
         }
       }
     },
-    "v1ScanEvent": {
+    "v1StreamScanResponse": {
       "type": "object",
       "properties": {
         "scanId": {

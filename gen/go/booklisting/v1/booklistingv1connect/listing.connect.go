@@ -61,7 +61,7 @@ type BookListingServiceClient interface {
 	// GetScan returns the current state of a scan job.
 	GetScan(context.Context, *connect.Request[v1.GetScanRequest]) (*connect.Response[v1.GetScanResponse], error)
 	// StreamScan streams scan progress events until the job is terminal.
-	StreamScan(context.Context, *connect.Request[v1.GetScanRequest]) (*connect.ServerStreamForClient[v1.ScanEvent], error)
+	StreamScan(context.Context, *connect.Request[v1.StreamScanRequest]) (*connect.ServerStreamForClient[v1.StreamScanResponse], error)
 }
 
 // NewBookListingServiceClient constructs a client for the booklisting.v1.BookListingService
@@ -99,7 +99,7 @@ func NewBookListingServiceClient(httpClient connect.HTTPClient, baseURL string, 
 			connect.WithSchema(bookListingServiceMethods.ByName("GetScan")),
 			connect.WithClientOptions(opts...),
 		),
-		streamScan: connect.NewClient[v1.GetScanRequest, v1.ScanEvent](
+		streamScan: connect.NewClient[v1.StreamScanRequest, v1.StreamScanResponse](
 			httpClient,
 			baseURL+BookListingServiceStreamScanProcedure,
 			connect.WithSchema(bookListingServiceMethods.ByName("StreamScan")),
@@ -114,7 +114,7 @@ type bookListingServiceClient struct {
 	createListing *connect.Client[v1.CreateListingRequest, v1.CreateListingResponse]
 	getListing    *connect.Client[v1.GetListingRequest, v1.GetListingResponse]
 	getScan       *connect.Client[v1.GetScanRequest, v1.GetScanResponse]
-	streamScan    *connect.Client[v1.GetScanRequest, v1.ScanEvent]
+	streamScan    *connect.Client[v1.StreamScanRequest, v1.StreamScanResponse]
 }
 
 // ScanBookCover calls booklisting.v1.BookListingService.ScanBookCover.
@@ -138,7 +138,7 @@ func (c *bookListingServiceClient) GetScan(ctx context.Context, req *connect.Req
 }
 
 // StreamScan calls booklisting.v1.BookListingService.StreamScan.
-func (c *bookListingServiceClient) StreamScan(ctx context.Context, req *connect.Request[v1.GetScanRequest]) (*connect.ServerStreamForClient[v1.ScanEvent], error) {
+func (c *bookListingServiceClient) StreamScan(ctx context.Context, req *connect.Request[v1.StreamScanRequest]) (*connect.ServerStreamForClient[v1.StreamScanResponse], error) {
 	return c.streamScan.CallServerStream(ctx, req)
 }
 
@@ -153,7 +153,7 @@ type BookListingServiceHandler interface {
 	// GetScan returns the current state of a scan job.
 	GetScan(context.Context, *connect.Request[v1.GetScanRequest]) (*connect.Response[v1.GetScanResponse], error)
 	// StreamScan streams scan progress events until the job is terminal.
-	StreamScan(context.Context, *connect.Request[v1.GetScanRequest], *connect.ServerStream[v1.ScanEvent]) error
+	StreamScan(context.Context, *connect.Request[v1.StreamScanRequest], *connect.ServerStream[v1.StreamScanResponse]) error
 }
 
 // NewBookListingServiceHandler builds an HTTP handler from the service implementation. It returns
@@ -230,6 +230,6 @@ func (UnimplementedBookListingServiceHandler) GetScan(context.Context, *connect.
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("booklisting.v1.BookListingService.GetScan is not implemented"))
 }
 
-func (UnimplementedBookListingServiceHandler) StreamScan(context.Context, *connect.Request[v1.GetScanRequest], *connect.ServerStream[v1.ScanEvent]) error {
+func (UnimplementedBookListingServiceHandler) StreamScan(context.Context, *connect.Request[v1.StreamScanRequest], *connect.ServerStream[v1.StreamScanResponse]) error {
 	return connect.NewError(connect.CodeUnimplemented, errors.New("booklisting.v1.BookListingService.StreamScan is not implemented"))
 }

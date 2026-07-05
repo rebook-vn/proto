@@ -183,7 +183,7 @@ func local_request_BookListingService_GetScan_0(ctx context.Context, marshaler r
 
 func request_BookListingService_StreamScan_0(ctx context.Context, marshaler runtime.Marshaler, client BookListingServiceClient, req *http.Request, pathParams map[string]string) (BookListingService_StreamScanClient, runtime.ServerMetadata, error) {
 	var (
-		protoReq GetScanRequest
+		protoReq StreamScanRequest
 		metadata runtime.ServerMetadata
 		err      error
 	)
